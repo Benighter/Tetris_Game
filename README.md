@@ -3,6 +3,9 @@
 ## Description
 This is a classic Tetris game implemented in JavaScript, HTML, and CSS. The game features a responsive design, smooth animations, and a modern look.
 
+## Live Demo
+Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
+
 ## Features
 - Responsive design for mobile and desktop
 - Smooth animations and transitions
