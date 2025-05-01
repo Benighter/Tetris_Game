@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="particles-container"></div>
+    <div class="stars">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    <h1>Tetris</h1>
+    <div id="game-container">
+        <canvas id="game-board" width="200" height="400"></canvas>
+        <div id="game-info">
+            <h2>Score: <span id="score">0</span></h2>
+            <h2>Level: <span id="level">1</span></h2>
+            <div id="next-piece-container">
+                <h3>Next Piece:</h3>
+                <canvas id="next-piece" width="80" height="80"></canvas>
+            </div>
+            <button id="start-button">Start Game</button>
+        </div>
+    </div>
+    
+    <div id="game-over">
+        <h2>Game Over!</h2>
+        <button id="restart-button">Play Again</button>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
