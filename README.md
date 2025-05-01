@@ -13,7 +13,7 @@ This is a classic Tetris game implemented in JavaScript, HTML, and CSS. The game
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/benighter/tetris_game.git
+   git clone https://github.com/Benighter/Tetris_Game.git
    ```
 2. Navigate to the project directory:
    ```bash
