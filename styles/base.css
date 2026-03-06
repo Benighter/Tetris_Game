@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --background-color: #0f0f1b;
+    --game-bg: #16213e;
+    --info-bg: #0f3460;
+    --text-color: #ecf0f1;
+    --border-radius: 10px;
+    --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    --neon-glow: 0 0 10px rgba(52, 152, 219, 0.7), 0 0 20px rgba(52, 152, 219, 0.5), 0 0 30px rgba(52, 152, 219, 0.3);
+    --neon-text-glow: 0 0 5px #fff, 0 0 10px #3498db, 0 0 15px #3498db, 0 0 20px #3498db;
+    --app-height: 100vh;
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: var(--app-height);
+    height: var(--app-height);
+    width: 100vw;
+    margin: 0;
+    padding: calc(0.5rem + var(--sat)) calc(0.75rem + var(--sar)) calc(0.75rem + var(--sab)) calc(0.75rem + var(--sal));
+    position: relative;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+}

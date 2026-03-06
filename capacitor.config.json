@@ -1,0 +1,8 @@
+{
+    "appId": "com.benighter.tetris",
+    "appName": "Tetris Game",
+    "webDir": "dist",
+    "server": {
+        "androidScheme": "https"
+    }
+}

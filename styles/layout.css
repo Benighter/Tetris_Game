@@ -1,0 +1,60 @@
+#game-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.35rem;
+    perspective: 1000px;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: min(1100px, 100%);
+}
+
+#particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+#game-over {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease-in-out;
+    margin: 0;
+    padding: calc(1rem + var(--sat)) calc(1rem + var(--sar)) calc(1rem + var(--sab)) calc(1rem + var(--sal));
+}
+
+@media (max-width: 768px) {
+    #game-container {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.9rem;
+        width: min(100%, 34rem);
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape), (max-height: 560px) {
+    #game-container {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: center;
+        gap: 0.9rem;
+        width: min(100%, 52rem);
+    }
+}

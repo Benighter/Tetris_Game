@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#08122d">
     <title>Tetris</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -30,25 +31,164 @@
         <div class="star"></div>
         <div class="star"></div>
     </div>
+    <div id="main-menu" class="overlay-shell">
+        <div class="menu-panel">
+            <p class="menu-eyebrow">Neon Arcade Stack</p>
+            <h2>Main Menu</h2>
+            <p class="menu-copy">Pick your mood, tune the board, and drop into a cleaner run.</p>
+            <div class="menu-actions">
+                <button id="menu-start-button" class="menu-primary-button">Start Run</button>
+                <button id="menu-zen-button" class="menu-secondary-button">Zen Start</button>
+                <button id="menu-settings-button" class="menu-secondary-button">Settings Lab</button>
+            </div>
+            <div class="menu-banner-row">
+                <section class="menu-banner-card">
+                    <p class="menu-eyebrow">Score To Beat</p>
+                    <strong id="menu-highscore-value">0</strong>
+                    <span id="menu-highscore-name">No local champion yet</span>
+                </section>
+                <section class="menu-banner-card menu-banner-card-wide">
+                    <p class="menu-eyebrow">Local Leaderboard</p>
+                    <ol id="leaderboard-list" class="leaderboard-list"></ol>
+                </section>
+            </div>
+            <div class="menu-grid">
+                <section class="menu-card">
+                    <h3>How To Play</h3>
+                    <p>Move with arrow keys or WASD. On mobile, tap to rotate, swipe to steer, or use the touch deck.</p>
+                </section>
+                <section class="menu-card">
+                    <h3>Run Modes</h3>
+                    <p>Zen Start softens the speed curve and trims particle noise for a calmer session.</p>
+                </section>
+                <section class="menu-card">
+                    <h3>Settings Lab</h3>
+                    <p>Toggle ghost pieces, grid lines, particles, speed profile, and starting level.</p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="overlay-shell hidden" aria-hidden="true">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <div>
+                    <p class="menu-eyebrow">Settings Lab</p>
+                    <h2>Board Tuning</h2>
+                </div>
+                <button id="settings-close-button" class="icon-button" aria-label="Close settings">×</button>
+            </div>
+            <div class="settings-grid">
+                <label class="setting-row">
+                    <span>Pilot Tag</span>
+                    <input id="setting-player-name" type="text" maxlength="18" placeholder="Player One">
+                </label>
+                <label class="setting-row">
+                    <span>Ghost Piece</span>
+                    <input id="setting-ghost" type="checkbox" checked>
+                </label>
+                <label class="setting-row">
+                    <span>Grid Lines</span>
+                    <input id="setting-grid" type="checkbox" checked>
+                </label>
+                <label class="setting-row">
+                    <span>Particle Effects</span>
+                    <input id="setting-particles" type="checkbox" checked>
+                </label>
+                <label class="setting-row">
+                    <span>Speed Profile</span>
+                    <select id="setting-speed-profile">
+                        <option value="chill">Chill</option>
+                        <option value="classic" selected>Classic</option>
+                        <option value="turbo">Turbo</option>
+                    </select>
+                </label>
+                <label class="setting-row">
+                    <span>Starting Level</span>
+                    <select id="setting-starting-level">
+                        <option value="1" selected>Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                        <option value="5">Level 5</option>
+                    </select>
+                </label>
+            </div>
+            <div class="settings-footer">
+                <button id="settings-reset-button" class="menu-secondary-button">Reset Defaults</button>
+                <button id="settings-apply-button" class="menu-primary-button">Apply Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="overlay-shell hidden" aria-hidden="true">
+        <div class="confirm-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+            <p class="menu-eyebrow">Confirm Action</p>
+            <h2 id="confirm-title">Are you sure?</h2>
+            <p id="confirm-message" class="confirm-copy"></p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-button" class="menu-secondary-button">Cancel</button>
+                <button id="confirm-accept-button" class="menu-primary-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <h1>Tetris</h1>
     <div id="game-container">
         <canvas id="game-board" width="200" height="400"></canvas>
         <div id="game-info">
-            <h2>Score: <span id="score">0</span></h2>
-            <h2>Level: <span id="level">1</span></h2>
+            <div class="info-stats">
+                <section class="info-stat">
+                    <span class="info-label">Score</span>
+                    <strong id="score">0</strong>
+                </section>
+                <section class="info-stat">
+                    <span class="info-label">Level</span>
+                    <strong id="level">1</strong>
+                </section>
+                <section class="info-stat">
+                    <span class="info-label">Beat</span>
+                    <strong id="highscore-target">0</strong>
+                </section>
+            </div>
             <div id="next-piece-container">
                 <h3>Next Piece:</h3>
                 <canvas id="next-piece" width="80" height="80"></canvas>
             </div>
             <button id="start-button">Start Game</button>
+            <div class="info-actions">
+                <button id="settings-button" class="info-secondary-button">Settings</button>
+                <button id="menu-button" class="info-secondary-button">Menu</button>
+            </div>
+            <p class="touch-hint">Tap the board to rotate. Swipe sideways to move. Hold down to slide or soft drop.</p>
+        </div>
+    </div>
+    <div id="mobile-controls" class="mobile-controls" aria-label="Touch controls">
+        <div class="touch-control-cluster touch-control-cluster-move">
+            <button class="touch-button" data-control="left" aria-label="Move left">◀</button>
+            <button class="touch-button touch-button-down" data-control="down" aria-label="Soft drop">▼</button>
+            <button class="touch-button" data-control="right" aria-label="Move right">▶</button>
+        </div>
+        <div class="touch-control-cluster touch-control-cluster-action">
+            <button class="touch-button touch-button-rotate" data-control="rotate" aria-label="Rotate piece">⟳</button>
+            <button class="touch-button touch-button-drop" data-control="drop" aria-label="Hard drop">Drop</button>
         </div>
     </div>
     
     <div id="game-over">
         <h2>Game Over!</h2>
-        <button id="restart-button">Play Again</button>
+        <div id="game-over-save-section" class="game-over-save-section hidden">
+            <p class="game-over-copy">Save this run to the local top 5 leaderboard.</p>
+            <input id="game-over-name-input" type="text" maxlength="18" placeholder="Player One">
+            <button id="save-score-button">Save Score</button>
+            <p id="save-score-status" class="game-over-status"></p>
+        </div>
+        <div class="game-over-actions">
+            <button id="restart-button">Play Again</button>
+            <button id="go-home-button" class="game-over-secondary-button">Go Home</button>
+        </div>
     </div>
     
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
