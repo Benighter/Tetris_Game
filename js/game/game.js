@@ -156,6 +156,14 @@ function syncGameOverSaveUI(message = '') {
     saveScoreStatus.textContent = message;
 }
 
+function syncStartButtonState() {
+    const hasActiveRun = state.board.length > 0 && !state.gameOver;
+
+    startButton.classList.toggle('start-button-guarded', hasActiveRun);
+    startButton.textContent = hasActiveRun ? 'Hold For New Run' : 'Start Run';
+    startButton.setAttribute('aria-label', hasActiveRun ? 'Hold to start a new run' : 'Start run');
+}
+
 export function getGameSpeed() {
     const profile = resolveSpeedProfile();
     const levelOffset = Math.max(0, state.level - state.settings.startingLevel);
@@ -174,8 +182,8 @@ export function startGame() {
     scoreElement.textContent = state.score;
     levelElement.textContent = state.level;
     gameOverElement.style.display = 'none';
-    startButton.textContent = 'Restart Run';
     syncGameOverSaveUI('');
+    syncStartButtonState();
 
     if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
@@ -272,6 +280,7 @@ export function resumeGame() {
 
 export function closeGameOver() {
     gameOverElement.style.display = 'none';
+    syncStartButtonState();
 }
 
 export function submitPendingLeaderboardEntry(playerName = state.settings.playerName) {

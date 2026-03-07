@@ -55,7 +55,7 @@
             <div class="menu-grid">
                 <section class="menu-card">
                     <h3>How To Play</h3>
-                    <p>Move with arrow keys or WASD. On mobile, tap to rotate, swipe to steer, or use the touch deck.</p>
+                    <p>Move with arrow keys or WASD. On mobile, drag the board to steer, tap to rotate, hold to soften the fall, and flick down to drop.</p>
                 </section>
                 <section class="menu-card">
                     <h3>Run Modes</h3>
@@ -155,22 +155,24 @@
                 <h3>Next Piece:</h3>
                 <canvas id="next-piece" width="80" height="80"></canvas>
             </div>
-            <button id="start-button">Start Game</button>
+            <button id="start-button" type="button">Start Run</button>
             <div class="info-actions">
                 <button id="settings-button" class="info-secondary-button">Settings</button>
                 <button id="menu-button" class="info-secondary-button">Menu</button>
             </div>
-            <p class="touch-hint">Tap the board to rotate. Swipe sideways to move. Hold down to slide or soft drop.</p>
+            <p class="touch-hint">Drag to steer, tap to rotate, hold to soften the fall, and flick down to drop. Hold the run button to start fresh.</p>
         </div>
     </div>
     <div id="mobile-controls" class="mobile-controls" aria-label="Touch controls">
-        <div class="touch-control-cluster touch-control-cluster-move">
-            <button class="touch-button" data-control="left" aria-label="Move left">◀</button>
-            <button class="touch-button touch-button-down" data-control="down" aria-label="Soft drop">▼</button>
-            <button class="touch-button" data-control="right" aria-label="Move right">▶</button>
+        <div class="touch-gesture-guide" aria-hidden="true">
+            <span class="touch-gesture-pill"><strong>Drag</strong> steer</span>
+            <span class="touch-gesture-pill"><strong>Tap</strong> rotate</span>
+            <span class="touch-gesture-pill"><strong>Hold</strong> soften</span>
+            <span class="touch-gesture-pill"><strong>Flick</strong> drop</span>
         </div>
         <div class="touch-control-cluster touch-control-cluster-action">
-            <button class="touch-button touch-button-rotate" data-control="rotate" aria-label="Rotate piece">⟳</button>
+            <button class="touch-button touch-button-rotate" data-control="rotate" aria-label="Rotate piece">Rotate</button>
+            <button class="touch-button touch-button-down" data-control="down" aria-label="Soft drop">Soft</button>
             <button class="touch-button touch-button-drop" data-control="drop" aria-label="Hard drop">Drop</button>
         </div>
     </div>

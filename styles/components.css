@@ -162,6 +162,12 @@ h1::after {
     letter-spacing: 2px;
 }
 
+#start-button.start-button-guarded {
+    background: linear-gradient(180deg, rgba(20, 59, 121, 0.92), rgba(10, 28, 68, 0.98));
+    border: 1px solid rgba(125, 210, 255, 0.25);
+    box-shadow: 0 10px 24px rgba(7, 20, 49, 0.45);
+}
+
 #start-button::before,
 #restart-button::before {
     content: '';
@@ -172,6 +178,17 @@ h1::after {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: 0.5s;
+}
+
+#start-button.start-button-guarded::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(93, 210, 255, 0.12), rgba(93, 210, 255, 0.48));
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+#start-button.start-button-arming::before {
+    animation: holdFill 0.65s linear forwards;
 }
 
 #start-button:focus,
@@ -191,9 +208,7 @@ h1::after {
     display: none;
     width: min(100%, 34rem);
     margin-top: 0.6rem;
-    gap: 0.8rem;
-    align-items: stretch;
-    justify-content: space-between;
+    gap: 0.55rem;
 }
 
 .touch-control-cluster {
@@ -201,14 +216,36 @@ h1::after {
     gap: 0.7rem;
 }
 
-.touch-control-cluster-move {
+.touch-control-cluster-action {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    flex: 1 1 auto;
 }
 
-.touch-control-cluster-action {
+.touch-gesture-guide {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    min-width: min(48%, 13.5rem);
+    gap: 0.5rem;
+}
+
+.touch-gesture-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 42px;
+    padding: 0.55rem 0.7rem;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(125, 210, 255, 0.15);
+    color: rgba(236, 240, 241, 0.78);
+    font-size: 0.74rem;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
+}
+
+.touch-gesture-pill strong {
+    color: #7fd8ff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
 }
 
 .touch-button {
@@ -420,10 +457,9 @@ h1::after {
 
     .mobile-controls {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
         width: min(100%, 32rem);
         margin-top: 0.45rem;
-        padding: 0.42rem;
+        padding: 0.48rem;
         gap: 0.42rem;
         border-radius: 18px;
         border: 1px solid rgba(125, 210, 255, 0.2);
@@ -433,16 +469,22 @@ h1::after {
     }
 
     .touch-control-cluster {
-        display: contents;
+        display: grid;
     }
 
     .touch-button {
-        min-height: 44px;
-        padding: 0.5rem 0.35rem;
+        min-height: 48px;
+        padding: 0.6rem 0.4rem;
         border-radius: 14px;
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         letter-spacing: 0.04rem;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .touch-gesture-pill {
+        min-height: 38px;
+        padding: 0.45rem 0.55rem;
+        font-size: 0.62rem;
     }
 }
 
@@ -503,5 +545,15 @@ h1::after {
 
     .touch-button {
         min-height: 46px;
+    }
+}
+
+@keyframes holdFill {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
     }
 }
