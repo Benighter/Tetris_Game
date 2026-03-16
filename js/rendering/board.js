@@ -16,16 +16,24 @@ let lastRenderTimestamp = 0;
 let pendingBoardRender = true;
 let pendingNextPieceRender = true;
 
+function hasPendingRender() {
+    return pendingBoardRender || pendingNextPieceRender;
+}
+
+function scheduleRender() {
+    if (state.renderLoopId) {
+        return;
+    }
+
+    state.renderLoopId = window.requestAnimationFrame(renderLoop);
+}
+
 function getRenderInterval() {
     if (state.settings.renderFps === 'unlimited') {
         return 0;
     }
 
     return 1000 / Number(state.settings.renderFps || 60);
-}
-
-function shouldContinuouslyRender() {
-    return state.board.length > 0 || Boolean(state.currentPiece) || Boolean(state.nextPiece) || state.isClearingLines;
 }
 
 function drawNextPieceBoardNow() {
@@ -55,10 +63,12 @@ function renderGameNow() {
 }
 
 function renderLoop(now) {
+    state.renderLoopId = null;
+
     const renderInterval = getRenderInterval();
     const canRender = renderInterval === 0 || now - lastRenderTimestamp >= renderInterval;
 
-    if (canRender && (pendingBoardRender || pendingNextPieceRender || shouldContinuouslyRender())) {
+    if (canRender && hasPendingRender()) {
         renderGameNow();
         drawNextPieceBoardNow();
         pendingBoardRender = false;
@@ -66,15 +76,13 @@ function renderLoop(now) {
         lastRenderTimestamp = now;
     }
 
-    state.renderLoopId = window.requestAnimationFrame(renderLoop);
+    if (hasPendingRender()) {
+        scheduleRender();
+    }
 }
 
 export function startRenderLoop() {
-    if (state.renderLoopId) {
-        return;
-    }
-
-    state.renderLoopId = window.requestAnimationFrame(renderLoop);
+    scheduleRender();
 }
 
 export function resetRenderTiming() {
@@ -166,7 +174,10 @@ export function drawNextPieceBoard(force = false) {
         drawNextPieceBoardNow();
         pendingNextPieceRender = false;
         lastRenderTimestamp = performance.now();
+        return;
     }
+
+    scheduleRender();
 }
 
 export function renderGame(force = false) {
@@ -175,7 +186,10 @@ export function renderGame(force = false) {
         renderGameNow();
         pendingBoardRender = false;
         lastRenderTimestamp = performance.now();
+        return;
     }
+
+    scheduleRender();
 }
 
 export function resizeGameBoard() {

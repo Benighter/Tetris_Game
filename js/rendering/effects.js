@@ -1,28 +1,50 @@
-import { canvas, gameOverElement, levelElement, particlesContainer, titleElement } from '../core/dom.js';
+import { canvas, context, gameOverElement, levelElement, particlesContainer, titleElement } from '../core/dom.js';
 import { COLORS } from '../core/constants.js';
 import { state } from '../core/state.js';
 
-export function animateLineClear(lines, callback) {
-    const flashCount = 3;
-    let currentFlash = 0;
+function getParticleCount(baseCount) {
+    if (!state.settings.showParticles) {
+        return 0;
+    }
 
-    const flashInterval = setInterval(() => {
-        const context = canvas.getContext('2d');
+    if (state.settings.renderFps === '30') {
+        return Math.max(2, Math.floor(baseCount * 0.45));
+    }
+
+    return baseCount;
+}
+
+export function animateLineClear(lines, callback) {
+    const duration = state.settings.renderFps === '30' ? 120 : 160;
+    const flashStep = 40;
+    const startTime = performance.now();
+
+    function drawFlash(elapsed) {
+        const flashIndex = Math.floor(elapsed / flashStep);
+
         lines.forEach(y => {
             for (let x = 0; x < state.board[y].length; x++) {
-                context.fillStyle = currentFlash % 2 === 0 ? '#FFFFFF' : COLORS[state.board[y][x]];
+                context.fillStyle = flashIndex % 2 === 0 ? '#FFFFFF' : COLORS[state.board[y][x]];
                 context.fillRect(x * state.blockSize, y * state.blockSize, state.blockSize, state.blockSize);
             }
         });
+    }
 
-        currentFlash++;
-        if (currentFlash >= flashCount * 2) {
-            clearInterval(flashInterval);
-            if (callback) {
-                callback();
-            }
+    function step(now) {
+        const elapsed = now - startTime;
+        drawFlash(elapsed);
+
+        if (elapsed < duration) {
+            window.requestAnimationFrame(step);
+            return;
         }
-    }, 100);
+
+        if (callback) {
+            callback();
+        }
+    }
+
+    window.requestAnimationFrame(step);
 }
 
 export function createParticle(x, y) {
@@ -51,36 +73,23 @@ export function createParticle(x, y) {
     particlesContainer.appendChild(particle);
 
     const angle = Math.random() * Math.PI * 2;
-    const speed = 1 + Math.random() * 4;
-    const vx = Math.cos(angle) * speed;
-    const vy = Math.sin(angle) * speed;
-    let opacity = 1;
-    let scale = 1;
-    let posX = 0;
-    let posY = 0;
-
-    const animate = () => {
-        posX += vx;
-        posY += vy;
-        scale -= 0.01;
-        opacity -= 0.02;
-
-        particle.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`;
-        particle.style.opacity = opacity;
-
-        if (opacity > 0) {
-            requestAnimationFrame(animate);
-        } else if (particle.parentNode === particlesContainer) {
+    const distance = 10 + Math.random() * 24;
+    const scale = 0.35 + Math.random() * 0.45;
+    particle.style.setProperty('--particle-x', `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty('--particle-y', `${Math.sin(angle) * distance}px`);
+    particle.style.setProperty('--particle-scale', `${scale}`);
+    particle.style.animation = 'particleBurst 420ms ease-out forwards';
+    particle.addEventListener('animationend', () => {
+        if (particle.parentNode === particlesContainer) {
             particlesContainer.removeChild(particle);
         }
-    };
-
-    requestAnimationFrame(animate);
+    }, { once: true });
 }
 
 export function createLineParticles(lines) {
     lines.forEach(y => {
-        for (let index = 0; index < 20; index++) {
+        const particleCount = getParticleCount(10);
+        for (let index = 0; index < particleCount; index++) {
             createParticle(Math.random() * canvas.width, y * state.blockSize);
         }
     });
@@ -96,7 +105,7 @@ export function createLandingEffect(piece = state.currentPiece) {
             if (piece.shape[y][x] > 0) {
                 const blockX = (piece.x + x) * state.blockSize;
                 const blockY = (piece.y + y) * state.blockSize;
-                const particleCount = 2 + Math.floor(Math.random() * 2);
+                const particleCount = getParticleCount(2 + Math.floor(Math.random() * 2));
 
                 for (let index = 0; index < particleCount; index++) {
                     createParticle(
@@ -120,7 +129,8 @@ export function animateLevelUp() {
         }
     }, 100);
 
-    for (let index = 0; index < 30; index++) {
+    const burstCount = getParticleCount(18);
+    for (let index = 0; index < burstCount; index++) {
         setTimeout(() => {
             const side = Math.floor(Math.random() * 4);
             const rect = canvas.getBoundingClientRect();
@@ -163,7 +173,8 @@ export function showGameOver() {
     const centerX = rect.left + canvas.width / 2;
     const centerY = rect.top + canvas.height / 2;
 
-    for (let index = 0; index < 50; index++) {
+    const burstCount = getParticleCount(24);
+    for (let index = 0; index < burstCount; index++) {
         setTimeout(() => {
             const angle = Math.random() * Math.PI * 2;
             const distance = Math.random() * 100;
@@ -188,7 +199,8 @@ export function animateGameStart() {
     const centerY = canvas.height / 2;
     const radius = Math.min(canvas.width, canvas.height) / 2;
 
-    for (let index = 0; index < 40; index++) {
+    const burstCount = getParticleCount(20);
+    for (let index = 0; index < burstCount; index++) {
         setTimeout(() => {
             const angle = (index / 40) * Math.PI * 2;
             const x = centerX + Math.cos(angle) * radius * Math.random();
