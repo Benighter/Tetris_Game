@@ -4,6 +4,13 @@ import {
     confirmMessageElement,
     confirmModalElement,
     confirmTitleElement,
+    controllerBindingPreviewButtons,
+    controllerRemapActionButtons,
+    controllerRemapCloseButton,
+    controllerRemapDoneButton,
+    controllerRemapModalElement,
+    controllerRemapResetButton,
+    controllerRemapStatusElement,
     ghostSettingInput,
     gridSettingInput,
     mainMenuElement,
@@ -11,8 +18,10 @@ import {
     menuSettingsButton,
     menuStartButton,
     menuZenButton,
+    openControllerRemapButton,
     particlesSettingInput,
     playerNameSettingInput,
+    resetControllerBindingsButton,
     settingsApplyButton,
     settingsButton,
     settingsCloseButton,
@@ -22,6 +31,11 @@ import {
     startingLevelSettingInput
 } from '../core/dom.js';
 import { defaultSettings, state, updateSettings } from '../core/state.js';
+import {
+    cloneControllerBindings,
+    CONTROLLER_BINDING_ROWS,
+    getControllerButtonLabel
+} from '../input/controller-config.js';
 import { closeGameOver, pauseGame, resumeGame, startGame, syncGameSettings } from '../game/game.js';
 import {
     getDefaultPlayerName,
@@ -33,21 +47,77 @@ const STORAGE_KEY = 'tetris-settings';
 let pausedForOverlay = false;
 let pausedForConfirmDialog = false;
 let confirmAction = null;
+let capturingControllerAction = null;
+
+function getBindingElements() {
+    return [...controllerBindingPreviewButtons, ...controllerRemapActionButtons];
+}
+
+function setBindingButtonValue(button, buttonName) {
+    button.dataset.binding = buttonName;
+    const pill = button.querySelector('.controller-binding-pill');
+    if (pill) {
+        pill.textContent = getControllerButtonLabel(buttonName);
+    }
+}
+
+function syncControllerBindingsUI(bindings = state.settings.controllerBindings) {
+    const nextBindings = cloneControllerBindings(bindings);
+    getBindingElements().forEach(button => {
+        const action = button.dataset.bindingAction || button.dataset.bindingPreviewAction;
+        if (!action) {
+            return;
+        }
+
+        setBindingButtonValue(button, nextBindings[action]);
+        button.classList.toggle('remap-row-active', capturingControllerAction === action);
+    });
+}
+
+function readControllerBindingsForm() {
+    return controllerBindingPreviewButtons.reduce((bindings, button) => {
+        const action = button.dataset.bindingPreviewAction;
+        if (!action) {
+            return bindings;
+        }
+
+        bindings[action] = button.dataset.binding || defaultSettings.controllerBindings[action];
+        return bindings;
+    }, cloneControllerBindings());
+}
+
+function setControllerRemapStatus(message) {
+    controllerRemapStatusElement.textContent = message;
+}
+
+function stopControllerBindingCapture() {
+    capturingControllerAction = null;
+    syncControllerBindingsUI(readControllerBindingsForm());
+    setControllerRemapStatus('Pick an action, press A to capture, then press the controller button you want.');
+}
 
 function hasActiveRun() {
     return state.board.length > 0 && !state.gameOver;
 }
 
-function isMainMenuOpen() {
+export function isMainMenuOpen() {
     return !mainMenuElement.classList.contains('hidden');
 }
 
-function isSettingsOpen() {
+export function isSettingsOpen() {
     return !settingsModalElement.classList.contains('hidden');
 }
 
-function isConfirmOpen() {
+export function isConfirmOpen() {
     return !confirmModalElement.classList.contains('hidden');
+}
+
+export function isControllerRemapOpen() {
+    return !controllerRemapModalElement.classList.contains('hidden');
+}
+
+export function isControllerBindingCaptureActive() {
+    return Boolean(capturingControllerAction);
 }
 
 function saveSettings() {
@@ -61,6 +131,7 @@ function syncSettingsForm() {
     particlesSettingInput.checked = state.settings.showParticles;
     speedProfileSettingInput.value = state.settings.speedProfile;
     startingLevelSettingInput.value = String(state.settings.startingLevel);
+    syncControllerBindingsUI(state.settings.controllerBindings);
 }
 
 function readSettingsForm() {
@@ -70,7 +141,8 @@ function readSettingsForm() {
         showGrid: gridSettingInput.checked,
         showParticles: particlesSettingInput.checked,
         speedProfile: speedProfileSettingInput.value,
-        startingLevel: Number(startingLevelSettingInput.value)
+        startingLevel: Number(startingLevelSettingInput.value),
+        controllerBindings: readControllerBindingsForm()
     };
 }
 
@@ -97,6 +169,56 @@ export function openMainMenu() {
 
 export function closeMainMenu() {
     mainMenuElement.classList.add('hidden');
+}
+
+export function openControllerRemap() {
+    syncControllerBindingsUI(readControllerBindingsForm());
+    controllerRemapModalElement.classList.remove('hidden');
+    controllerRemapModalElement.setAttribute('aria-hidden', 'false');
+    stopControllerBindingCapture();
+}
+
+export function closeControllerRemap() {
+    stopControllerBindingCapture();
+    controllerRemapModalElement.classList.add('hidden');
+    controllerRemapModalElement.setAttribute('aria-hidden', 'true');
+}
+
+function resetControllerBindingsForm() {
+    syncControllerBindingsUI(defaultSettings.controllerBindings);
+}
+
+export function beginControllerBindingCapture(action) {
+    capturingControllerAction = action;
+    syncControllerBindingsUI(readControllerBindingsForm());
+
+    const bindingMeta = CONTROLLER_BINDING_ROWS.find(row => row.action === action);
+    setControllerRemapStatus(`Waiting for a button for ${bindingMeta?.label || 'this action'}...`);
+}
+
+export function assignControllerBinding(buttonName) {
+    if (!capturingControllerAction) {
+        return false;
+    }
+
+    const bindings = readControllerBindingsForm();
+    const previousButton = bindings[capturingControllerAction];
+    const conflictingAction = Object.entries(bindings).find(([action, binding]) => action !== capturingControllerAction && binding === buttonName)?.[0] || null;
+
+    bindings[capturingControllerAction] = buttonName;
+    if (conflictingAction) {
+        bindings[conflictingAction] = previousButton;
+    }
+
+    syncControllerBindingsUI(bindings);
+    setControllerRemapStatus(`Bound ${CONTROLLER_BINDING_ROWS.find(row => row.action === capturingControllerAction)?.label || 'action'} to ${getControllerButtonLabel(buttonName)}.`);
+    capturingControllerAction = null;
+    syncControllerBindingsUI(bindings);
+    return true;
+}
+
+export function getDisplayedControllerBindings() {
+    return readControllerBindingsForm();
 }
 
 function closeConfirmDialog({ shouldResume = true } = {}) {
@@ -173,6 +295,7 @@ export function openSettings() {
 }
 
 export function closeSettings() {
+    closeControllerRemap();
     settingsModalElement.classList.add('hidden');
     settingsModalElement.setAttribute('aria-hidden', 'true');
 
@@ -220,7 +343,8 @@ function loadSavedSettings() {
         const savedSettings = JSON.parse(rawSettings);
         updateSettings({
             ...defaultSettings,
-            ...savedSettings
+            ...savedSettings,
+            controllerBindings: cloneControllerBindings(savedSettings.controllerBindings)
         });
     } catch {
         updateSettings(defaultSettings);
@@ -230,10 +354,23 @@ function loadSavedSettings() {
 }
 
 function resetSettings() {
-    applySettings(defaultSettings);
+    applySettings({
+        ...defaultSettings,
+        controllerBindings: cloneControllerBindings(defaultSettings.controllerBindings)
+    });
 }
 
-function handleAppBackNavigation() {
+export function handleAppBackNavigation() {
+    if (isControllerBindingCaptureActive()) {
+        stopControllerBindingCapture();
+        return;
+    }
+
+    if (isControllerRemapOpen()) {
+        closeControllerRemap();
+        return;
+    }
+
     if (isConfirmOpen()) {
         closeConfirmDialog();
         return;
@@ -293,14 +430,32 @@ export function initMenuUI() {
     settingsButton.addEventListener('click', openSettings);
     menuButton.addEventListener('click', openMainMenu);
     settingsCloseButton.addEventListener('click', closeSettings);
+    openControllerRemapButton.addEventListener('click', openControllerRemap);
+    resetControllerBindingsButton.addEventListener('click', resetControllerBindingsForm);
     settingsApplyButton.addEventListener('click', () => {
         applySettings(readSettingsForm());
         closeSettings();
     });
     settingsResetButton.addEventListener('click', resetSettings);
+    controllerBindingPreviewButtons.forEach(button => {
+        button.addEventListener('click', openControllerRemap);
+    });
+    controllerRemapCloseButton.addEventListener('click', closeControllerRemap);
+    controllerRemapDoneButton.addEventListener('click', closeControllerRemap);
+    controllerRemapResetButton.addEventListener('click', resetControllerBindingsForm);
+    controllerRemapActionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            beginControllerBindingCapture(button.dataset.bindingAction);
+        });
+    });
     settingsModalElement.addEventListener('click', event => {
         if (event.target === settingsModalElement) {
             closeSettings();
+        }
+    });
+    controllerRemapModalElement.addEventListener('click', event => {
+        if (event.target === controllerRemapModalElement) {
+            closeControllerRemap();
         }
     });
     confirmCancelButton.addEventListener('click', () => {

@@ -9,11 +9,14 @@ Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
 ## Features
 - Responsive design for mobile and desktop
 - Touch controls with tap, swipe, and hold support for mobile play
+- Auto-detected gamepad support with controller-aware UI hints
+- Controller remap deck inside Settings Lab with live mapping preview
 - Smooth animations and transitions
 - Score and level tracking
 - Next piece preview
 - Game over screen with restart option
 - Capacitor-based Android packaging support
+- Immersive Android fullscreen that hides system bars during play
 
 ## Project Structure
 - `script.js` and `style.css` are now thin entrypoints.
@@ -42,6 +45,8 @@ Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
 - Use the arrow keys to move and rotate the Tetris pieces.
 - Press the spacebar to drop the piece instantly.
 - On mobile, tap the board to rotate, swipe to move, or use the on-screen control deck.
+- On a controller, use the D-pad or left stick to move, A/X/Y or up to rotate, RT to hard drop, Start to pause, and B to go back.
+- Open Settings Lab during a run to inspect or remap the controller deck.
 - Try to complete lines to score points and advance levels.
 
 ## Android APK

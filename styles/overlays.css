@@ -16,7 +16,8 @@
 
 .menu-panel,
 .settings-panel,
-.confirm-panel {
+.confirm-panel,
+.controller-remap-panel {
     width: min(920px, 100%);
     border: 1px solid rgba(100, 190, 255, 0.35);
     border-radius: 28px;
@@ -35,6 +36,11 @@
 
 .confirm-panel {
     width: min(460px, 100%);
+    padding: 1.7rem;
+}
+
+.controller-remap-panel {
+    width: min(680px, 100%);
     padding: 1.7rem;
 }
 
@@ -59,6 +65,21 @@
     color: rgba(236, 240, 241, 0.82);
     font-size: 1rem;
     line-height: 1.6;
+}
+
+.controller-status-chip {
+    display: none;
+    width: fit-content;
+    margin-top: 0.95rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(93, 210, 255, 0.12);
+    border: 1px solid rgba(125, 210, 255, 0.22);
+    color: #8be2ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
 }
 
 .menu-actions,
@@ -212,6 +233,21 @@
     line-height: 1.55;
 }
 
+.how-to-play-copy {
+    display: none;
+}
+
+body:not([data-input-mode]) .how-to-play-keyboard,
+body[data-input-mode='keyboard'] .how-to-play-keyboard,
+body[data-input-mode='touch'] .how-to-play-touch,
+body[data-input-mode='gamepad'] .how-to-play-gamepad {
+    display: block;
+}
+
+body[data-input-mode='gamepad'] .controller-status-chip {
+    display: inline-flex;
+}
+
 .settings-header {
     display: flex;
     justify-content: space-between;
@@ -223,6 +259,105 @@
     display: grid;
     gap: 0.9rem;
     margin-top: 1.5rem;
+}
+
+.controller-settings-card {
+    margin-top: 1.25rem;
+    padding: 1.15rem;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(125, 210, 255, 0.18);
+}
+
+.controller-section-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+}
+
+.controller-section-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.15rem;
+}
+
+.controller-settings-copy,
+.controller-remap-status {
+    max-width: 20rem;
+    color: rgba(236, 240, 241, 0.78);
+    line-height: 1.55;
+}
+
+.controller-map-preview,
+.remap-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.controller-map-row,
+.remap-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.05rem;
+    border-radius: 18px;
+    border: 1px solid rgba(125, 210, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    text-align: left;
+}
+
+.controller-map-row strong,
+.remap-row strong {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.92rem;
+}
+
+.controller-map-row p,
+.remap-row p {
+    margin-top: 0.3rem;
+    color: rgba(236, 240, 241, 0.76);
+    line-height: 1.45;
+}
+
+.controller-map-row-static {
+    cursor: default;
+}
+
+.controller-binding-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 78px;
+    min-height: 38px;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 210, 255, 0.25);
+    background: rgba(93, 210, 255, 0.12);
+    color: #8be2ff;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+}
+
+.controller-section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1rem;
+}
+
+.remap-row-active {
+    border-color: rgba(93, 210, 255, 0.72);
+    box-shadow: 0 0 0 2px rgba(93, 210, 255, 0.22), 0 0 26px rgba(93, 210, 255, 0.18);
+}
+
+.remap-row-active .controller-binding-pill {
+    background: rgba(93, 210, 255, 0.22);
 }
 
 .setting-row {
@@ -295,7 +430,8 @@
 
     .menu-panel,
     .settings-panel,
-    .confirm-panel {
+    .confirm-panel,
+    .controller-remap-panel {
         padding: 1.25rem;
         border-radius: 22px;
         overflow: auto;
@@ -311,7 +447,10 @@
 
     .settings-header,
     .setting-row,
-    .settings-footer {
+    .settings-footer,
+    .controller-section-header,
+    .controller-map-row,
+    .remap-row {
         flex-direction: column;
         align-items: stretch;
     }
@@ -332,5 +471,15 @@
 
     .confirm-actions {
         flex-direction: column-reverse;
+    }
+
+    .controller-settings-copy,
+    .controller-remap-status {
+        max-width: none;
+    }
+
+    .controller-binding-pill {
+        min-width: 0;
+        align-self: flex-start;
     }
 }

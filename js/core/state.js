@@ -1,10 +1,13 @@
+import { cloneControllerBindings } from '../input/controller-config.js';
+
 export const defaultSettings = {
     playerName: 'Player One',
     showGhostPiece: true,
     showGrid: true,
     showParticles: true,
     speedProfile: 'classic',
-    startingLevel: 1
+    startingLevel: 1,
+    controllerBindings: cloneControllerBindings()
 };
 
 export const state = {
@@ -21,7 +24,10 @@ export const state = {
     nextPiece: null,
     blockSize: 20,
     nextPieceBlockSize: 20,
-    settings: { ...defaultSettings }
+    settings: {
+        ...defaultSettings,
+        controllerBindings: cloneControllerBindings(defaultSettings.controllerBindings)
+    }
 };
 
 export function resetGameState() {
@@ -41,6 +47,7 @@ export function resetGameState() {
 export function updateSettings(nextSettings) {
     state.settings = {
         ...state.settings,
-        ...nextSettings
+        ...nextSettings,
+        controllerBindings: cloneControllerBindings(nextSettings.controllerBindings || state.settings.controllerBindings)
     };
 }

@@ -36,6 +36,7 @@
             <p class="menu-eyebrow">Neon Arcade Stack</p>
             <h2>Main Menu</h2>
             <p class="menu-copy">Pick your mood, tune the board, and drop into a cleaner run.</p>
+            <p class="controller-status-chip" aria-live="polite">Controller connected</p>
             <div class="menu-actions">
                 <button id="menu-start-button" class="menu-primary-button">Start Run</button>
                 <button id="menu-zen-button" class="menu-secondary-button">Zen Start</button>
@@ -55,7 +56,10 @@
             <div class="menu-grid">
                 <section class="menu-card">
                     <h3>How To Play</h3>
-                    <p>Move with arrow keys or WASD. On mobile, drag the board to steer, tap to rotate, hold to soften the fall, and flick down to drop.</p>
+                    <p>Clear full lines, keep the stack low, and survive as the speed ramps up.</p>
+                    <p class="how-to-play-copy how-to-play-keyboard">Keyboard: left and right move, up rotates, down soft drops, and space hard drops.</p>
+                    <p class="how-to-play-copy how-to-play-touch">Touch: drag the board to steer, tap to rotate, hold to soft drop, and flick down to hard drop.</p>
+                    <p class="how-to-play-copy how-to-play-gamepad">Gamepad: D-pad or left stick moves, A or X rotates, RT hard drops, Start pauses, and B goes back.</p>
                 </section>
                 <section class="menu-card">
                     <h3>Run Modes</h3>
@@ -114,9 +118,120 @@
                     </select>
                 </label>
             </div>
+            <section class="controller-settings-card">
+                <div class="controller-section-header">
+                    <div>
+                        <p class="menu-eyebrow">Controller Deck</p>
+                        <h3>Live Mapping</h3>
+                    </div>
+                    <p class="controller-settings-copy">D-pad moves focus, left and right adjust rows, A selects, B backs out.</p>
+                </div>
+                <div class="controller-map-preview">
+                    <div class="controller-map-row controller-map-row-static">
+                        <div>
+                            <strong>Move Piece</strong>
+                            <p>D-pad and left stick stay active for movement and menu navigation.</p>
+                        </div>
+                        <span class="controller-binding-pill">D-pad / Stick</span>
+                    </div>
+                    <button type="button" class="controller-map-row" data-binding-preview-action="confirm">
+                        <div>
+                            <strong>Menu Select</strong>
+                            <p>Used to confirm buttons, rows, and overlay actions.</p>
+                        </div>
+                        <span class="controller-binding-pill">X</span>
+                    </button>
+                    <button type="button" class="controller-map-row" data-binding-preview-action="rotate">
+                        <div>
+                            <strong>Rotate Piece</strong>
+                            <p>Main action for turning the active tetromino.</p>
+                        </div>
+                        <span class="controller-binding-pill">A</span>
+                    </button>
+                    <button type="button" class="controller-map-row" data-binding-preview-action="drop">
+                        <div>
+                            <strong>Hard Drop</strong>
+                            <p>Instantly lock the current piece to the stack.</p>
+                        </div>
+                        <span class="controller-binding-pill">RT</span>
+                    </button>
+                    <button type="button" class="controller-map-row" data-binding-preview-action="pause">
+                        <div>
+                            <strong>Pause / Menu</strong>
+                            <p>Open the pause layer or return to the main menu.</p>
+                        </div>
+                        <span class="controller-binding-pill">Start</span>
+                    </button>
+                    <button type="button" class="controller-map-row" data-binding-preview-action="back">
+                        <div>
+                            <strong>Back / Cancel</strong>
+                            <p>Dismiss overlays or move one step back.</p>
+                        </div>
+                        <span class="controller-binding-pill">B</span>
+                    </button>
+                </div>
+                <div class="controller-section-actions">
+                    <button id="open-controller-remap-button" class="menu-secondary-button" type="button">Remap Controls</button>
+                    <button id="reset-controller-bindings-button" class="menu-secondary-button" type="button">Restore Defaults</button>
+                </div>
+            </section>
             <div class="settings-footer">
                 <button id="settings-reset-button" class="menu-secondary-button">Reset Defaults</button>
                 <button id="settings-apply-button" class="menu-primary-button">Apply Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="controller-remap-modal" class="overlay-shell hidden" aria-hidden="true">
+        <div class="controller-remap-panel" role="dialog" aria-modal="true" aria-labelledby="controller-remap-title">
+            <div class="settings-header">
+                <div>
+                    <p class="menu-eyebrow">Controller Deck</p>
+                    <h2 id="controller-remap-title">Remap Controls</h2>
+                    <p id="controller-remap-status" class="controller-remap-status">Pick an action, press A to capture, then press the controller button you want.</p>
+                </div>
+                <button id="controller-remap-close-button" class="icon-button" aria-label="Close controller remap">×</button>
+            </div>
+            <div class="remap-list">
+                <button type="button" class="remap-row" data-binding-action="confirm">
+                    <div>
+                        <strong>Menu Select</strong>
+                        <p>Confirms buttons, rows, and modal actions.</p>
+                    </div>
+                    <span class="controller-binding-pill">X</span>
+                </button>
+                <button type="button" class="remap-row" data-binding-action="rotate">
+                    <div>
+                        <strong>Rotate Piece</strong>
+                        <p>Turns the current tetromino during a run.</p>
+                    </div>
+                    <span class="controller-binding-pill">A</span>
+                </button>
+                <button type="button" class="remap-row" data-binding-action="drop">
+                    <div>
+                        <strong>Hard Drop</strong>
+                        <p>Slams the active piece to the stack.</p>
+                    </div>
+                    <span class="controller-binding-pill">RT</span>
+                </button>
+                <button type="button" class="remap-row" data-binding-action="pause">
+                    <div>
+                        <strong>Pause / Menu</strong>
+                        <p>Opens the pause layer or surfaces the menu.</p>
+                    </div>
+                    <span class="controller-binding-pill">Start</span>
+                </button>
+                <button type="button" class="remap-row" data-binding-action="back">
+                    <div>
+                        <strong>Back / Cancel</strong>
+                        <p>Dismisses overlays and backs out one layer.</p>
+                    </div>
+                    <span class="controller-binding-pill">B</span>
+                </button>
+            </div>
+            <div class="settings-footer">
+                <button id="controller-remap-reset-button" class="menu-secondary-button" type="button">Restore Defaults</button>
+                <button id="controller-remap-done-button" class="menu-primary-button" type="button">Done</button>
             </div>
         </div>
     </div>
@@ -160,6 +275,7 @@
                 <button id="settings-button" class="info-secondary-button">Settings</button>
                 <button id="menu-button" class="info-secondary-button">Menu</button>
             </div>
+            <p class="controller-hint">Controller active. Open Settings for your live bindings and remap deck.</p>
             <p class="touch-hint">Drag to steer, tap to rotate, hold to soften the fall, and flick down to drop. Hold the run button to start fresh.</p>
         </div>
     </div>

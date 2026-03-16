@@ -1,21 +1,40 @@
 import {
     canvas,
+    confirmModalElement,
+    controllerRemapModalElement,
     gameOverNameInput,
+    gameOverElement,
+    gameInfoElement,
     goHomeButton,
+    mainMenuElement,
     menuButton,
     mobileControlsElement,
     restartButton,
     saveScoreButton,
+    settingsModalElement,
     settingsButton,
     startButton
 } from '../core/dom.js';
-import { openMainMenu } from '../ui/menu.js';
+import { resizeGameBoard } from '../rendering/board.js';
+import {
+    assignControllerBinding,
+    beginControllerBindingCapture,
+    closeMainMenu,
+    handleAppBackNavigation,
+    isControllerBindingCaptureActive,
+    isConfirmOpen,
+    isControllerRemapOpen,
+    isMainMenuOpen,
+    isSettingsOpen,
+    openMainMenu
+} from '../ui/menu.js';
 import { state } from '../core/state.js';
 import {
     closeGameOver,
     hardDropCurrentPiece,
     moveCurrentPiece,
     rotateCurrentPiece,
+    resumeGame,
     softDropCurrentPiece,
     submitPendingLeaderboardEntry,
     startGame
@@ -35,6 +54,168 @@ const BOARD_HARD_DROP_DURATION = 215;
 const START_BUTTON_HOLD_DELAY = 650;
 let activeGesture = null;
 let startButtonHoldTimerId = null;
+let controllerConnected = false;
+let controllerFocusedElement = null;
+
+function detectBaseInputMode() {
+    const hasTouchSupport = navigator.maxTouchPoints > 0 || window.matchMedia?.('(pointer: coarse)').matches;
+    return hasTouchSupport ? 'touch' : 'keyboard';
+}
+
+function isElementVisible(element) {
+    if (!element) {
+        return false;
+    }
+
+    const styles = window.getComputedStyle(element);
+    return Boolean(element)
+        && !element.disabled
+        && styles.display !== 'none'
+        && styles.visibility !== 'hidden'
+        && styles.opacity !== '0'
+        && element.getClientRects().length > 0
+        && !element.classList.contains('hidden');
+}
+
+function clearControllerFocus() {
+    controllerFocusedElement?.classList.remove('controller-focus');
+    controllerFocusedElement = null;
+}
+
+function getControllerScope() {
+    if (isControllerRemapOpen()) {
+        return controllerRemapModalElement;
+    }
+
+    if (isElementVisible(confirmModalElement)) {
+        return confirmModalElement;
+    }
+
+    if (isElementVisible(settingsModalElement)) {
+        return settingsModalElement;
+    }
+
+    if (isElementVisible(mainMenuElement)) {
+        return mainMenuElement;
+    }
+
+    if (isElementVisible(gameOverElement)) {
+        return gameOverElement;
+    }
+
+    return gameInfoElement;
+}
+
+function getControllerFocusableElements() {
+    const scope = getControllerScope();
+    if (!scope) {
+        return [];
+    }
+
+    return [...scope.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled])')].filter(isElementVisible);
+}
+
+function cycleSelectValue(selectElement, direction) {
+    const options = [...selectElement.options];
+    const currentIndex = options.findIndex(option => option.value === selectElement.value);
+    if (currentIndex < 0) {
+        return false;
+    }
+
+    const nextIndex = (currentIndex + direction + options.length) % options.length;
+    selectElement.value = options[nextIndex].value;
+    selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+}
+
+function adjustFocusedSetting(direction) {
+    if (!(controllerFocusedElement instanceof HTMLElement)) {
+        return false;
+    }
+
+    if (controllerFocusedElement instanceof HTMLSelectElement) {
+        return cycleSelectValue(controllerFocusedElement, direction);
+    }
+
+    if (controllerFocusedElement instanceof HTMLInputElement && controllerFocusedElement.type === 'checkbox') {
+        controllerFocusedElement.checked = direction > 0;
+        controllerFocusedElement.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+    }
+
+    return false;
+}
+
+function syncControllerFocus(nextElement = null) {
+    if (!controllerConnected) {
+        clearControllerFocus();
+        return;
+    }
+
+    const focusableElements = getControllerFocusableElements();
+    if (focusableElements.length === 0) {
+        clearControllerFocus();
+        return;
+    }
+
+    const elementToFocus = focusableElements.includes(nextElement)
+        ? nextElement
+        : focusableElements.includes(controllerFocusedElement)
+            ? controllerFocusedElement
+            : focusableElements[0];
+
+    if (controllerFocusedElement && controllerFocusedElement !== elementToFocus) {
+        controllerFocusedElement.classList.remove('controller-focus');
+    }
+
+    controllerFocusedElement = elementToFocus;
+    controllerFocusedElement.classList.add('controller-focus');
+    controllerFocusedElement.focus?.({ preventScroll: true });
+}
+
+function moveControllerFocus(step) {
+    const focusableElements = getControllerFocusableElements();
+    if (focusableElements.length === 0) {
+        clearControllerFocus();
+        return;
+    }
+
+    const currentIndex = focusableElements.indexOf(controllerFocusedElement);
+    const nextIndex = currentIndex >= 0
+        ? (currentIndex + step + focusableElements.length) % focusableElements.length
+        : 0;
+
+    syncControllerFocus(focusableElements[nextIndex]);
+}
+
+function activateControllerFocus() {
+    const focusableElements = getControllerFocusableElements();
+    if (focusableElements.length === 0) {
+        return;
+    }
+
+    if (!focusableElements.includes(controllerFocusedElement)) {
+        syncControllerFocus(focusableElements[0]);
+    }
+
+    if (controllerFocusedElement instanceof HTMLInputElement) {
+        if (controllerFocusedElement.type === 'checkbox') {
+            controllerFocusedElement.checked = !controllerFocusedElement.checked;
+            controllerFocusedElement.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+            controllerFocusedElement.focus({ preventScroll: true });
+            controllerFocusedElement.select?.();
+        }
+    } else if (controllerFocusedElement instanceof HTMLSelectElement) {
+        cycleSelectValue(controllerFocusedElement, 1);
+    } else {
+        controllerFocusedElement?.click();
+    }
+
+    window.setTimeout(() => {
+        syncControllerFocus();
+    }, 0);
+}
 
 function blurFocusedButton() {
     if (
@@ -89,6 +270,10 @@ function canControlActivePiece() {
 
 function hasActiveRun() {
     return state.board.length > 0 && !state.gameOver;
+}
+
+function isGameOverVisible() {
+    return isElementVisible(gameOverElement);
 }
 
 function triggerControl(action) {
@@ -392,7 +577,156 @@ function goHomeFromGameOver() {
     openMainMenu();
 }
 
+export function setControllerConnected(isConnected) {
+    controllerConnected = isConnected;
+    document.body.classList.toggle('controller-connected', isConnected);
+    document.body.dataset.inputMode = isConnected ? 'gamepad' : detectBaseInputMode();
+
+    if (isConnected) {
+        syncControllerFocus();
+    } else {
+        clearControllerFocus();
+    }
+
+    resizeGameBoard();
+}
+
+export function handleGamepadDirection(direction) {
+    if (isControllerBindingCaptureActive()) {
+        return;
+    }
+
+    if (canControlActivePiece()) {
+        triggerControl(direction === 'up' ? 'rotate' : direction);
+        return;
+    }
+
+    if (isSettingsOpen() || isControllerRemapOpen()) {
+        if (direction === 'up') {
+            moveControllerFocus(-1);
+            return;
+        }
+
+        if (direction === 'down') {
+            moveControllerFocus(1);
+            return;
+        }
+
+        if (!adjustFocusedSetting(direction === 'left' ? -1 : 1)) {
+            moveControllerFocus(direction === 'left' ? -1 : 1);
+        }
+        return;
+    }
+
+    if (direction === 'left' || direction === 'up') {
+        moveControllerFocus(-1);
+        return;
+    }
+
+    if (direction === 'right' || direction === 'down') {
+        moveControllerFocus(1);
+    }
+}
+
+export function handleGamepadConfirm() {
+    if (canControlActivePiece()) {
+        triggerControl('rotate');
+        return;
+    }
+
+    if (
+        isControllerBindingCaptureActive()
+        && controllerFocusedElement instanceof HTMLButtonElement
+        && controllerFocusedElement.dataset.bindingAction
+    ) {
+        beginControllerBindingCapture(controllerFocusedElement.dataset.bindingAction);
+        return;
+    }
+
+    activateControllerFocus();
+}
+
+export function handleGamepadRotate() {
+    if (canControlActivePiece()) {
+        triggerControl('rotate');
+    }
+}
+
+export function handleGamepadDrop() {
+    if (canControlActivePiece()) {
+        triggerControl('drop');
+    }
+}
+
+export function handleGamepadPause() {
+    if (isConfirmOpen() || isSettingsOpen() || isControllerRemapOpen()) {
+        handleAppBackNavigation();
+        window.setTimeout(() => {
+            syncControllerFocus();
+        }, 0);
+        return;
+    }
+
+    if (isMainMenuOpen() && hasActiveRun() && state.isPaused) {
+        closeMainMenu();
+        resumeGame();
+        syncControllerFocus();
+        return;
+    }
+
+    if (!isGameOverVisible()) {
+        openMainMenu();
+        syncControllerFocus();
+    }
+}
+
+export function handleGamepadBack() {
+    handleAppBackNavigation();
+    window.setTimeout(() => {
+        syncControllerFocus();
+    }, 0);
+}
+
+export function handleGamepadAction(actionName) {
+    switch (actionName) {
+        case 'confirm':
+            handleGamepadConfirm();
+            break;
+        case 'rotate':
+            handleGamepadRotate();
+            break;
+        case 'drop':
+            handleGamepadDrop();
+            break;
+        case 'pause':
+            handleGamepadPause();
+            break;
+        case 'back':
+            handleGamepadBack();
+            break;
+        default:
+            break;
+    }
+}
+
+export function handleGamepadButtonPress(buttonName) {
+    if (!isControllerBindingCaptureActive()) {
+        return;
+    }
+
+    if (assignControllerBinding(buttonName)) {
+        window.setTimeout(() => {
+            syncControllerFocus();
+        }, 0);
+    }
+}
+
+export function isGamepadCaptureActive() {
+    return isControllerBindingCaptureActive();
+}
+
 export function initControls() {
+    document.body.dataset.inputMode = detectBaseInputMode();
     document.addEventListener('keydown', handleKeydown);
     startButton.addEventListener('click', handleStartButtonClick);
     startButton.addEventListener('pointerdown', handleStartButtonPressStart);
@@ -415,5 +749,20 @@ export function initControls() {
             event.preventDefault();
             saveScoreFromGameOver();
         }
+    });
+    document.addEventListener('focusin', event => {
+        if (
+            !controllerConnected
+            || !(
+                event.target instanceof HTMLButtonElement
+                || event.target instanceof HTMLInputElement
+                || event.target instanceof HTMLSelectElement
+            )
+            || !isElementVisible(event.target)
+        ) {
+            return;
+        }
+
+        syncControllerFocus(event.target);
     });
 }
