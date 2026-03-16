@@ -52,11 +52,11 @@ function restartGameLoop() {
 function resolveSpeedProfile() {
     switch (state.settings.speedProfile) {
         case 'chill':
-            return { baseDelay: 1150, levelStep: 45, minDelay: 380 };
+            return { baseDelay: 1150, levelStep: 42, minDelay: 430 };
         case 'turbo':
-            return { baseDelay: 900, levelStep: 70, minDelay: 180 };
+            return { baseDelay: 900, levelStep: 62, minDelay: 240 };
         default:
-            return { baseDelay: 1000, levelStep: 60, minDelay: 250 };
+            return { baseDelay: 1000, levelStep: 54, minDelay: 300 };
     }
 }
 
@@ -192,8 +192,8 @@ export function startGame() {
     state.currentPiece = getRandomPiece();
     state.nextPiece = getRandomPiece();
 
-    renderGame();
-    drawNextPieceBoard();
+    renderGame(true);
+    drawNextPieceBoard(true);
     refreshLeaderboardUI();
     restartGameLoop();
     animateGameStart();
@@ -317,6 +317,6 @@ export function syncGameSettings() {
         levelElement.textContent = state.level;
     }
 
-    renderGame();
-    drawNextPieceBoard();
+    renderGame(true);
+    drawNextPieceBoard(true);
 }

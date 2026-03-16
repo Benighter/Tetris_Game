@@ -46,6 +46,7 @@ export const playerNameSettingInput = document.getElementById('setting-player-na
 export const ghostSettingInput = document.getElementById('setting-ghost');
 export const gridSettingInput = document.getElementById('setting-grid');
 export const particlesSettingInput = document.getElementById('setting-particles');
+export const renderFpsSettingInput = document.getElementById('setting-render-fps');
 export const speedProfileSettingInput = document.getElementById('setting-speed-profile');
 export const startingLevelSettingInput = document.getElementById('setting-starting-level');
 export const menuHighscoreValueElement = document.getElementById('menu-highscore-value');

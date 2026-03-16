@@ -12,6 +12,77 @@ import {
 import { state } from '../core/state.js';
 import { shadeColor } from '../utils/color.js';
 
+let lastRenderTimestamp = 0;
+let pendingBoardRender = true;
+let pendingNextPieceRender = true;
+
+function getRenderInterval() {
+    if (state.settings.renderFps === 'unlimited') {
+        return 0;
+    }
+
+    return 1000 / Number(state.settings.renderFps || 60);
+}
+
+function shouldContinuouslyRender() {
+    return state.board.length > 0 || Boolean(state.currentPiece) || Boolean(state.nextPiece) || state.isClearingLines;
+}
+
+function drawNextPieceBoardNow() {
+    nextPieceContext.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
+    if (!state.nextPiece) {
+        return;
+    }
+
+    const { shape, colorIndex } = state.nextPiece;
+    const offsetX = Math.floor((NEXT_PIECE_COLS - shape[0].length) / 2);
+    const offsetY = Math.floor((NEXT_PIECE_ROWS - shape.length) / 2);
+
+    shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value > 0) {
+                drawBlock(nextPieceContext, x + offsetX, y + offsetY, COLORS[colorIndex], state.nextPieceBlockSize);
+            }
+        });
+    });
+}
+
+function renderGameNow() {
+    drawBoard();
+    if (state.currentPiece) {
+        state.currentPiece.draw();
+    }
+}
+
+function renderLoop(now) {
+    const renderInterval = getRenderInterval();
+    const canRender = renderInterval === 0 || now - lastRenderTimestamp >= renderInterval;
+
+    if (canRender && (pendingBoardRender || pendingNextPieceRender || shouldContinuouslyRender())) {
+        renderGameNow();
+        drawNextPieceBoardNow();
+        pendingBoardRender = false;
+        pendingNextPieceRender = false;
+        lastRenderTimestamp = now;
+    }
+
+    state.renderLoopId = window.requestAnimationFrame(renderLoop);
+}
+
+export function startRenderLoop() {
+    if (state.renderLoopId) {
+        return;
+    }
+
+    state.renderLoopId = window.requestAnimationFrame(renderLoop);
+}
+
+export function resetRenderTiming() {
+    lastRenderTimestamp = 0;
+    pendingBoardRender = true;
+    pendingNextPieceRender = true;
+}
+
 function getGapSize(element) {
     const styles = window.getComputedStyle(element);
     const gap = Number.parseFloat(styles.gap || styles.rowGap || '0');
@@ -89,29 +160,21 @@ export function drawBoard() {
     });
 }
 
-export function drawNextPieceBoard() {
-    nextPieceContext.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
-    if (!state.nextPiece) {
-        return;
+export function drawNextPieceBoard(force = false) {
+    pendingNextPieceRender = true;
+    if (force) {
+        drawNextPieceBoardNow();
+        pendingNextPieceRender = false;
+        lastRenderTimestamp = performance.now();
     }
-
-    const { shape, colorIndex } = state.nextPiece;
-    const offsetX = Math.floor((NEXT_PIECE_COLS - shape[0].length) / 2);
-    const offsetY = Math.floor((NEXT_PIECE_ROWS - shape.length) / 2);
-
-    shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value > 0) {
-                drawBlock(nextPieceContext, x + offsetX, y + offsetY, COLORS[colorIndex], state.nextPieceBlockSize);
-            }
-        });
-    });
 }
 
-export function renderGame() {
-    drawBoard();
-    if (state.currentPiece) {
-        state.currentPiece.draw();
+export function renderGame(force = false) {
+    pendingBoardRender = true;
+    if (force) {
+        renderGameNow();
+        pendingBoardRender = false;
+        lastRenderTimestamp = performance.now();
     }
 }
 
@@ -158,7 +221,7 @@ export function resizeGameBoard() {
     nextPieceCanvas.height = state.nextPieceBlockSize * NEXT_PIECE_ROWS;
 
     if (state.board.length > 0) {
-        renderGame();
-        drawNextPieceBoard();
+        renderGame(true);
+        drawNextPieceBoard(true);
     }
 }

@@ -5,6 +5,7 @@ export const defaultSettings = {
     showGhostPiece: true,
     showGrid: true,
     showParticles: true,
+    renderFps: '60',
     speedProfile: 'classic',
     startingLevel: 1,
     controllerBindings: cloneControllerBindings()
@@ -20,6 +21,7 @@ export const state = {
     isPaused: false,
     hasSubmittedScore: false,
     gameInterval: null,
+    renderLoopId: null,
     currentPiece: null,
     nextPiece: null,
     blockSize: 20,

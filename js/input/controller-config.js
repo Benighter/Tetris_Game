@@ -27,9 +27,9 @@ export const CONTROLLER_BUTTON_LABELS = {
 };
 
 export const DEFAULT_CONTROLLER_BINDINGS = {
-    confirm: 'west',
-    rotate: 'south',
-    drop: 'rightTrigger',
+    confirm: 'south',
+    rotate: 'west',
+    drop: 'rightShoulder',
     pause: 'start',
     back: 'east'
 };

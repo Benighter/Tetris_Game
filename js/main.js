@@ -1,12 +1,9 @@
 import { initParticles } from './rendering/effects.js';
-import { resizeGameBoard } from './rendering/board.js';
-import { state } from './core/state.js';
+import { resizeGameBoard, startRenderLoop } from './rendering/board.js';
 import {
-    handleGamepadAction,
     handleGamepadButtonPress,
     handleGamepadDirection,
     initControls,
-    isGamepadCaptureActive,
     setControllerConnected
 } from './input/controls.js';
 import { createGamepadManager } from './input/gamepad.js';
@@ -25,19 +22,15 @@ function initializeApp() {
     initMenuUI();
     initControls();
     initParticles();
+    startRenderLoop();
 
     gamepadManager?.destroy?.();
     gamepadManager = createGamepadManager({
-        getBindings() {
-            return state.settings.controllerBindings;
-        },
         onConnectionChange({ connected }) {
             setControllerConnected(connected);
         },
-        shouldSuppressActions: isGamepadCaptureActive,
         onDirection: handleGamepadDirection,
-        onButtonPress: handleGamepadButtonPress,
-        onAction: handleGamepadAction
+        onButtonPress: handleGamepadButtonPress
     });
 }
 

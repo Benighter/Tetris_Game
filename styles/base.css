@@ -23,6 +23,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 body {
@@ -41,4 +43,11 @@ body {
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: manipulation;
+}
+
+input,
+textarea,
+select {
+    -webkit-user-select: text;
+    user-select: text;
 }

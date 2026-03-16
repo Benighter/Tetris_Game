@@ -59,7 +59,7 @@
                     <p>Clear full lines, keep the stack low, and survive as the speed ramps up.</p>
                     <p class="how-to-play-copy how-to-play-keyboard">Keyboard: left and right move, up rotates, down soft drops, and space hard drops.</p>
                     <p class="how-to-play-copy how-to-play-touch">Touch: drag the board to steer, tap to rotate, hold to soft drop, and flick down to hard drop.</p>
-                    <p class="how-to-play-copy how-to-play-gamepad">Gamepad: D-pad or left stick moves, A or X rotates, RT hard drops, Start pauses, and B goes back.</p>
+                    <p class="how-to-play-copy how-to-play-gamepad">Gamepad: menus use A to confirm and B to go back. In game, X or B rotates, A or RB drops, and Start pauses.</p>
                 </section>
                 <section class="menu-card">
                     <h3>Run Modes</h3>
@@ -98,6 +98,14 @@
                 <label class="setting-row">
                     <span>Particle Effects</span>
                     <input id="setting-particles" type="checkbox" checked>
+                </label>
+                <label class="setting-row">
+                    <span>Render FPS</span>
+                    <select id="setting-render-fps">
+                        <option value="30">30 FPS</option>
+                        <option value="60" selected>60 FPS</option>
+                        <option value="unlimited">Unlimited</option>
+                    </select>
                 </label>
                 <label class="setting-row">
                     <span>Speed Profile</span>
@@ -139,21 +147,21 @@
                             <strong>Menu Select</strong>
                             <p>Used to confirm buttons, rows, and overlay actions.</p>
                         </div>
-                        <span class="controller-binding-pill">X</span>
+                        <span class="controller-binding-pill">A</span>
                     </button>
                     <button type="button" class="controller-map-row" data-binding-preview-action="rotate">
                         <div>
                             <strong>Rotate Piece</strong>
-                            <p>Main action for turning the active tetromino.</p>
+                            <p>Main action for turning the active tetromino. B also rotates during gameplay.</p>
                         </div>
-                        <span class="controller-binding-pill">A</span>
+                        <span class="controller-binding-pill">X</span>
                     </button>
                     <button type="button" class="controller-map-row" data-binding-preview-action="drop">
                         <div>
                             <strong>Hard Drop</strong>
-                            <p>Instantly lock the current piece to the stack.</p>
+                            <p>Instantly lock the current piece to the stack. A also hard drops during gameplay.</p>
                         </div>
-                        <span class="controller-binding-pill">RT</span>
+                        <span class="controller-binding-pill">RB</span>
                     </button>
                     <button type="button" class="controller-map-row" data-binding-preview-action="pause">
                         <div>
@@ -198,21 +206,21 @@
                         <strong>Menu Select</strong>
                         <p>Confirms buttons, rows, and modal actions.</p>
                     </div>
-                    <span class="controller-binding-pill">X</span>
+                    <span class="controller-binding-pill">A</span>
                 </button>
                 <button type="button" class="remap-row" data-binding-action="rotate">
                     <div>
                         <strong>Rotate Piece</strong>
-                        <p>Turns the current tetromino during a run.</p>
+                        <p>Turns the current tetromino during a run. B also rotates in gameplay.</p>
                     </div>
-                    <span class="controller-binding-pill">A</span>
+                    <span class="controller-binding-pill">X</span>
                 </button>
                 <button type="button" class="remap-row" data-binding-action="drop">
                     <div>
                         <strong>Hard Drop</strong>
-                        <p>Slams the active piece to the stack.</p>
+                        <p>Slams the active piece to the stack. A also hard drops in gameplay.</p>
                     </div>
-                    <span class="controller-binding-pill">RT</span>
+                    <span class="controller-binding-pill">RB</span>
                 </button>
                 <button type="button" class="remap-row" data-binding-action="pause">
                     <div>

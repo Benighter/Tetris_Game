@@ -1,7 +1,6 @@
 import {
     CONTROLLER_BUTTON_INDEXES,
-    CONTROLLER_BUTTON_ORDER,
-    DEFAULT_CONTROLLER_BINDINGS
+    CONTROLLER_BUTTON_ORDER
 } from './controller-config.js';
 
 const AXIS_THRESHOLD = 0.55;
@@ -54,17 +53,6 @@ function resolveDirectionalInput(gamepad) {
     }
 
     return null;
-}
-
-function getMappedActions(bindings) {
-    return Object.entries(bindings).reduce((map, [action, buttonName]) => {
-        if (!map.has(buttonName)) {
-            map.set(buttonName, []);
-        }
-
-        map.get(buttonName).push(action);
-        return map;
-    }, new Map());
 }
 
 export function createGamepadManager(callbacks = {}) {
@@ -135,19 +123,11 @@ export function createGamepadManager(callbacks = {}) {
 
         if (activeGamepad) {
             const buttons = activeGamepad.buttons || [];
-            const actionsByButton = getMappedActions(callbacks.getBindings?.() || DEFAULT_CONTROLLER_BINDINGS);
             fireDirectionalInput(resolveDirectionalInput(activeGamepad), performance.now());
             CONTROLLER_BUTTON_ORDER.forEach(buttonName => {
                 const buttonIndex = CONTROLLER_BUTTON_INDEXES[buttonName];
                 fireButtonPress(buttonName, isPressed(buttons[buttonIndex]), () => {
                     callbacks.onButtonPress?.(buttonName);
-                    if (callbacks.shouldSuppressActions?.()) {
-                        return;
-                    }
-
-                    actionsByButton.get(buttonName)?.forEach(actionName => {
-                        callbacks.onAction?.(actionName);
-                    });
                 });
             });
         } else {

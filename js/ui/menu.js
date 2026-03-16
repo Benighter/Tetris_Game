@@ -21,6 +21,7 @@ import {
     openControllerRemapButton,
     particlesSettingInput,
     playerNameSettingInput,
+    renderFpsSettingInput,
     resetControllerBindingsButton,
     settingsApplyButton,
     settingsButton,
@@ -129,6 +130,7 @@ function syncSettingsForm() {
     ghostSettingInput.checked = state.settings.showGhostPiece;
     gridSettingInput.checked = state.settings.showGrid;
     particlesSettingInput.checked = state.settings.showParticles;
+    renderFpsSettingInput.value = state.settings.renderFps;
     speedProfileSettingInput.value = state.settings.speedProfile;
     startingLevelSettingInput.value = String(state.settings.startingLevel);
     syncControllerBindingsUI(state.settings.controllerBindings);
@@ -140,6 +142,7 @@ function readSettingsForm() {
         showGhostPiece: ghostSettingInput.checked,
         showGrid: gridSettingInput.checked,
         showParticles: particlesSettingInput.checked,
+        renderFps: renderFpsSettingInput.value,
         speedProfile: speedProfileSettingInput.value,
         startingLevel: Number(startingLevelSettingInput.value),
         controllerBindings: readControllerBindingsForm()

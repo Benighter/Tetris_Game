@@ -11,6 +11,7 @@ Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
 - Touch controls with tap, swipe, and hold support for mobile play
 - Auto-detected gamepad support with controller-aware UI hints
 - Controller remap deck inside Settings Lab with live mapping preview
+- Render FPS selector with 30, 60, and unlimited modes
 - Smooth animations and transitions
 - Score and level tracking
 - Next piece preview
@@ -45,7 +46,7 @@ Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
 - Use the arrow keys to move and rotate the Tetris pieces.
 - Press the spacebar to drop the piece instantly.
 - On mobile, tap the board to rotate, swipe to move, or use the on-screen control deck.
-- On a controller, use the D-pad or left stick to move, A/X/Y or up to rotate, RT to hard drop, Start to pause, and B to go back.
+- On a controller, use A to confirm menus, B to go back, X or B to rotate in game, and A or RB to hard drop.
 - Open Settings Lab during a run to inspect or remap the controller deck.
 - Try to complete lines to score points and advance levels.
 

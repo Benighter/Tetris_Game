@@ -20,6 +20,7 @@ import {
     assignControllerBinding,
     beginControllerBindingCapture,
     closeMainMenu,
+    getDisplayedControllerBindings,
     handleAppBackNavigation,
     isControllerBindingCaptureActive,
     isConfirmOpen,
@@ -629,11 +630,6 @@ export function handleGamepadDirection(direction) {
 }
 
 export function handleGamepadConfirm() {
-    if (canControlActivePiece()) {
-        triggerControl('rotate');
-        return;
-    }
-
     if (
         isControllerBindingCaptureActive()
         && controllerFocusedElement instanceof HTMLButtonElement
@@ -688,29 +684,47 @@ export function handleGamepadBack() {
 }
 
 export function handleGamepadAction(actionName) {
-    switch (actionName) {
-        case 'confirm':
-            handleGamepadConfirm();
-            break;
-        case 'rotate':
-            handleGamepadRotate();
-            break;
-        case 'drop':
-            handleGamepadDrop();
-            break;
-        case 'pause':
-            handleGamepadPause();
-            break;
-        case 'back':
-            handleGamepadBack();
-            break;
-        default:
-            break;
+    if (actionName) {
+        return;
     }
 }
 
 export function handleGamepadButtonPress(buttonName) {
     if (!isControllerBindingCaptureActive()) {
+        const bindings = getDisplayedControllerBindings();
+
+        if (canControlActivePiece()) {
+            if (buttonName === bindings.pause) {
+                handleGamepadPause();
+                return;
+            }
+
+            if (buttonName === bindings.drop || buttonName === 'south') {
+                handleGamepadDrop();
+                return;
+            }
+
+            if (buttonName === bindings.rotate || buttonName === 'east') {
+                handleGamepadRotate();
+            }
+
+            return;
+        }
+
+        if (buttonName === bindings.pause) {
+            handleGamepadPause();
+            return;
+        }
+
+        if (buttonName === bindings.back) {
+            handleGamepadBack();
+            return;
+        }
+
+        if (buttonName === bindings.confirm) {
+            handleGamepadConfirm();
+        }
+
         return;
     }
 
