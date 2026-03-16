@@ -49,15 +49,20 @@ function restartGameLoop() {
     state.gameInterval = setInterval(gameLoop, getGameSpeed());
 }
 
-function resolveSpeedProfile() {
-    switch (state.settings.speedProfile) {
-        case 'chill':
-            return { baseDelay: 1150, levelStep: 42, minDelay: 430 };
-        case 'turbo':
-            return { baseDelay: 900, levelStep: 62, minDelay: 240 };
-        default:
-            return { baseDelay: 1000, levelStep: 54, minDelay: 300 };
+const CLASSIC_GRAVITY_FRAMES = [
+    48, 43, 38, 33, 28, 23, 18, 13, 8, 6,
+    5, 5, 5,
+    4, 4, 4,
+    3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+];
+
+function getClassicGravityFrames(level) {
+    if (level >= 29) {
+        return 1;
     }
+
+    return CLASSIC_GRAVITY_FRAMES[level - 1] || 1;
 }
 
 function spawnNextPiece() {
@@ -97,7 +102,7 @@ function clearLines() {
         state.score += calculateScore(validatedLines.length);
         scoreElement.textContent = state.score;
 
-        const newLevel = Math.floor(state.totalLinesCleared / 10) + state.settings.startingLevel;
+        const newLevel = Math.floor(state.totalLinesCleared / 10) + 1;
         if (newLevel > state.level) {
             state.level = newLevel;
             levelElement.textContent = state.level;
@@ -165,9 +170,7 @@ function syncStartButtonState() {
 }
 
 export function getGameSpeed() {
-    const profile = resolveSpeedProfile();
-    const levelOffset = Math.max(0, state.level - state.settings.startingLevel);
-    return Math.max(profile.baseDelay - (levelOffset * profile.levelStep), profile.minDelay);
+    return Math.max(Math.round((1000 / 60) * getClassicGravityFrames(state.level)), 16);
 }
 
 export function startGame() {
@@ -292,8 +295,7 @@ export function submitPendingLeaderboardEntry(playerName = state.settings.player
         name: playerName,
         score: state.score,
         level: state.level,
-        lines: state.totalLinesCleared,
-        speedProfile: state.settings.speedProfile
+        lines: state.totalLinesCleared
     });
 
     state.hasSubmittedScore = true;
@@ -312,8 +314,8 @@ export function syncGameSettings() {
         restartGameLoop();
     }
 
-    if (state.board.length === 0 || state.level < state.settings.startingLevel) {
-        state.level = state.settings.startingLevel;
+    if (state.board.length === 0 || state.level < 1) {
+        state.level = 1;
         levelElement.textContent = state.level;
     }
 

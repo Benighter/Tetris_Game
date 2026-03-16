@@ -5,8 +5,8 @@ import {
 
 const AXIS_THRESHOLD = 0.55;
 const BUTTON_THRESHOLD = 0.45;
-const INITIAL_REPEAT_DELAY = 170;
-const HELD_REPEAT_DELAY = 85;
+const INITIAL_REPEAT_DELAY = 267;
+const HELD_REPEAT_DELAY = 100;
 const REPEATABLE_DIRECTIONS = new Set(['left', 'right', 'down']);
 
 function isPressed(button) {

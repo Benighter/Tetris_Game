@@ -48,8 +48,8 @@ const BOARD_TAP_DISTANCE = 14;
 const BOARD_TAP_DURATION = 230;
 const BOARD_HORIZONTAL_STEP = 22;
 const BOARD_SOFT_DROP_STEP = 26;
-const BOARD_SOFT_DROP_HOLD_DELAY = 170;
-const BOARD_SOFT_DROP_REPEAT = 72;
+const BOARD_SOFT_DROP_HOLD_DELAY = 267;
+const BOARD_SOFT_DROP_REPEAT = 100;
 const BOARD_HARD_DROP_DISTANCE = 110;
 const BOARD_HARD_DROP_DURATION = 215;
 const START_BUTTON_HOLD_DELAY = 650;
@@ -330,7 +330,7 @@ function startTouchRepeat(action) {
         if (repeatState) {
             repeatState.intervalId = intervalId;
         }
-    }, 170);
+    }, 267);
 
     activeTouchRepeats.set(action, {
         timeoutId,

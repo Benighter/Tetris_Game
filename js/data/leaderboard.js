@@ -53,7 +53,6 @@ export function submitLeaderboardEntry(entry) {
         score: Number(entry.score) || 0,
         level: Number(entry.level) || 1,
         lines: Number(entry.lines) || 0,
-        speedProfile: entry.speedProfile || 'classic',
         playedAt: entry.playedAt || new Date().toISOString()
     };
 

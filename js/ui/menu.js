@@ -21,15 +21,12 @@ import {
     openControllerRemapButton,
     particlesSettingInput,
     playerNameSettingInput,
-    renderFpsSettingInput,
     resetControllerBindingsButton,
     settingsApplyButton,
     settingsButton,
     settingsCloseButton,
     settingsModalElement,
-    settingsResetButton,
-    speedProfileSettingInput,
-    startingLevelSettingInput
+    settingsResetButton
 } from '../core/dom.js';
 import { defaultSettings, state, updateSettings } from '../core/state.js';
 import {
@@ -130,9 +127,6 @@ function syncSettingsForm() {
     ghostSettingInput.checked = state.settings.showGhostPiece;
     gridSettingInput.checked = state.settings.showGrid;
     particlesSettingInput.checked = state.settings.showParticles;
-    renderFpsSettingInput.value = state.settings.renderFps;
-    speedProfileSettingInput.value = state.settings.speedProfile;
-    startingLevelSettingInput.value = String(state.settings.startingLevel);
     syncControllerBindingsUI(state.settings.controllerBindings);
 }
 
@@ -142,9 +136,6 @@ function readSettingsForm() {
         showGhostPiece: ghostSettingInput.checked,
         showGrid: gridSettingInput.checked,
         showParticles: particlesSettingInput.checked,
-        renderFps: renderFpsSettingInput.value,
-        speedProfile: speedProfileSettingInput.value,
-        startingLevel: Number(startingLevelSettingInput.value),
         controllerBindings: readControllerBindingsForm()
     };
 }
@@ -326,8 +317,7 @@ function startFromMenu() {
 function startZenRun() {
     closeConfirmDialog({ shouldResume: false });
     applySettings({
-        showParticles: false,
-        speedProfile: 'chill'
+        showParticles: false
     });
     closeMainMenu();
     closeGameOver();
@@ -344,10 +334,16 @@ function loadSavedSettings() {
 
     try {
         const savedSettings = JSON.parse(rawSettings);
+        const {
+            startingLevel: _removedStartingLevel,
+            renderFps: _removedRenderFps,
+            speedProfile: _removedSpeedProfile,
+            ...sanitizedSavedSettings
+        } = savedSettings;
         updateSettings({
             ...defaultSettings,
-            ...savedSettings,
-            controllerBindings: cloneControllerBindings(savedSettings.controllerBindings)
+            ...sanitizedSavedSettings,
+            controllerBindings: cloneControllerBindings(sanitizedSavedSettings.controllerBindings)
         });
     } catch {
         updateSettings(defaultSettings);

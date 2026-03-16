@@ -5,9 +5,6 @@ export const defaultSettings = {
     showGhostPiece: true,
     showGrid: true,
     showParticles: true,
-    renderFps: '60',
-    speedProfile: 'classic',
-    startingLevel: 1,
     controllerBindings: cloneControllerBindings()
 };
 
@@ -35,7 +32,7 @@ export const state = {
 export function resetGameState() {
     state.board = [];
     state.score = 0;
-    state.level = state.settings.startingLevel;
+    state.level = 1;
     state.totalLinesCleared = 0;
     state.gameOver = false;
     state.isClearingLines = false;
@@ -47,9 +44,22 @@ export function resetGameState() {
 }
 
 export function updateSettings(nextSettings) {
+    const {
+        startingLevel: _removedStartingLevel,
+        renderFps: _removedRenderFps,
+        speedProfile: _removedSpeedProfile,
+        ...sanitizedNextSettings
+    } = nextSettings;
+    const {
+        startingLevel: _legacyStartingLevel,
+        renderFps: _legacyRenderFps,
+        speedProfile: _legacySpeedProfile,
+        ...currentSettings
+    } = state.settings;
+
     state.settings = {
-        ...state.settings,
-        ...nextSettings,
-        controllerBindings: cloneControllerBindings(nextSettings.controllerBindings || state.settings.controllerBindings)
+        ...currentSettings,
+        ...sanitizedNextSettings,
+        controllerBindings: cloneControllerBindings(sanitizedNextSettings.controllerBindings || currentSettings.controllerBindings)
     };
 }

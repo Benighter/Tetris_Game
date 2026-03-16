@@ -7,16 +7,12 @@ function getParticleCount(baseCount) {
         return 0;
     }
 
-    if (state.settings.renderFps === '30') {
-        return Math.max(2, Math.floor(baseCount * 0.45));
-    }
-
     return baseCount;
 }
 
 export function animateLineClear(lines, callback) {
-    const duration = state.settings.renderFps === '30' ? 120 : 160;
-    const flashStep = 40;
+    const duration = Math.min(340, 220 + (lines.length * 28));
+    const flashStep = 66;
     const startTime = performance.now();
 
     function drawFlash(elapsed) {

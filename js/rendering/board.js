@@ -29,11 +29,7 @@ function scheduleRender() {
 }
 
 function getRenderInterval() {
-    if (state.settings.renderFps === 'unlimited') {
-        return 0;
-    }
-
-    return 1000 / Number(state.settings.renderFps || 60);
+    return 1000 / 60;
 }
 
 function drawNextPieceBoardNow() {

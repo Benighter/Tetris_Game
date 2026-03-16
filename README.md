@@ -11,8 +11,8 @@ Check out the live demo [here](https://tetris-game-self-phi.vercel.app/).
 - Touch controls with tap, swipe, and hold support for mobile play
 - Auto-detected gamepad support with controller-aware UI hints
 - Controller remap deck inside Settings Lab with live mapping preview
-- Render FPS selector with 30, 60, and unlimited modes
-- Smooth animations and transitions
+- Classic Tetris-style fixed timing for gravity, clears, and controller movement
+- Smooth animations and transitions with a modern presentation
 - Score and level tracking
 - Next piece preview
 - Game over screen with restart option
